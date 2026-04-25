@@ -141,28 +141,6 @@ The synthesis results for the FPGA are summarized here:
 
 ---
 
-## File Structure
-
-```
-smart-parking-lot/
-├── images/                    # Project Documentation Assets
-│   ├── Block Diagram.jpeg
-│   ├── Schematic.PNG
-│   ├── Resource Utilization.PNG
-│   └── TB output.PNG
-├── rtl/
-│   ├── m1_scheduler_top.v     # M1: Round-robin scheduler
-│   ├── m2_distance_calc.v     # M2: Time-to-cm conversion
-│   ├── m3_threshold_cmp.v     # M3: Occupancy classifier
-│   └── m4_lcd_top.v           # M4: LCD formatter + HD44780 driver
-├── tb/
-│   ├── parking_lot_tb.v       # Main system testbench
-│   └── ...
-├── LICENSE
-└── README.md
-```
-
----
 
 ## Timing Parameters
 
@@ -173,16 +151,3 @@ smart-parking-lot/
 ≈ 144 ms per full poll of all three slots
 ```
 
----
-
-## LCD Display Format
-
-The HD44780 16×2 display shows live slot status:
-
-```
-┌────────────────┐
-│P1:FREE P2:OCC  │  ← Line 1 (DDRAM addr 0x00)
-│P3:FREE         │  ← Line 2 (DDRAM addr 0x40)
-└────────────────┘
-```
-Status strings: `FREE` (4 chars, slot empty) · `OCC ` (4 chars with trailing space, slot occupied).
