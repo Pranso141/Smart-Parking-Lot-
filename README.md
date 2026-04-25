@@ -31,7 +31,7 @@ The key design challenge is that all three HC-SR04 sensors **cannot** be trigger
 ---
 
 ## Architecture
-
+![Block Diagram](images/Block Diagram.jpeg)
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                     SENSOR LAYER                        │
@@ -67,8 +67,9 @@ The key design challenge is that all three HC-SR04 sensors **cannot** be trigger
 │  M4 — LCD Formatter + HD44780 16×2 Display Driver       │
 │  Slot display format  →  Live slot readout              │
 └─────────────────────────────────────────────────────────┘
+
 ```
-![forest](images/Block Diagram.jpeg)
+
 ---
 
 ## Module Reference
