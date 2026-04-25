@@ -1,5 +1,5 @@
 
-# Smart Parking Lo
+# Smart Parking Lot
 
 A Verilog implementation of a real-time smart parking lot monitor that uses three HC-SR04 ultrasonic sensors to detect vehicle occupancy across three parking slots and displays live status on a 16×2 HD44780 LCD.
 
