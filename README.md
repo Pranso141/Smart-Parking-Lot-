@@ -250,62 +250,6 @@ smart-parking-lot/
 └── README.md
 ```
 
----
-
-## Simulation & Testbenches
-
-Both testbenches use **reduced timing parameters** so simulations complete in microseconds of wall time rather than real seconds.
-
-### M1 Testbench (`m1_tb.v`)
-
-Tests three complete round-robin cycles with three distinct echo scenarios:
-
-| Sensor | Behaviour | Interpretation |
-|--------|-----------|----------------|
-| Slot 1 | Short echo (40 ticks) | Car close — **OCCUPIED** |
-| Slot 2 | Long echo (200 ticks) | Car far — **FREE** |
-| Slot 3 | No echo | Timeout fires — **EMPTY** |
-
-**Self-checks:**
-- Round-robin order enforced (`slot_id` must follow `0 → 1 → 2 → 0`)
-- `echo_ticks` within ±1 of injected pulse width
-- Slot 3 always reports exactly `ECHO_TIMEOUT`
-- No simultaneous trigger assertions (`$countones(trig_out) ≤ 1`)
-
-**Run:**
-```bash
-iverilog -o m1_sim rtl/m1_scheduler_top.v tb/m1_tb.v && vvp m1_sim
-gtkwave sim/m1_tb.vcd
-```
-
----
-
-### M4 Testbench (`m4_tb.v`)
-
-Drives all six meaningful `slot_status` transitions and verifies the full 32-character LCD frame after each update:
-
-| Phase | `slot_status` | Line 1 | Line 2 |
-|-------|--------------|--------|--------|
-| Initial | `3'b000` | `P1:FREE P2:FREE ` | `P3:FREE         ` |
-| 3 | `3'b001` | `P1:OCC  P2:FREE ` | `P3:FREE         ` |
-| 4 | `3'b011` | `P1:OCC  P2:OCC  ` | `P3:FREE         ` |
-| 5 | `3'b111` | `P1:OCC  P2:OCC  ` | `P3:OCC          ` |
-| 6 | `3'b000` | `P1:FREE P2:FREE ` | `P3:FREE         ` |
-
-**Self-checks:**
-- `lcd_rw` always LOW
-- E-pulse never exceeds `T_EHIGH + 2` ticks
-- All 32 captured data bytes match expected ASCII for the latched status
-- Watchdog timeout catches any FSM hang
-
-**Run:**
-```bash
-iverilog -o m4_sim rtl/m4_lcd_top.v tb/m4_tb.v && vvp m4_sim
-gtkwave sim/m4_tb.vcd
-```
-
----
-
 ## Timing Parameters
 
 ### HC-SR04 Timing Reference
@@ -354,14 +298,3 @@ The HD44780 16×2 display shows live slot status:
 Status strings: `FREE` (4 chars, slot empty) · `OCC ` (4 chars with trailing space, slot occupied)
 
 The display is only rewritten when `slot_status` changes, minimising LCD bus traffic.
-
----
-
-## Team Allocation
-
-| Module | Member | Responsibility |
-|--------|--------|----------------|
-| **M1** | Member 1 | Round-robin scheduler, HC-SR04 trigger sequencing, echo timing |
-| **M2** | Member 2 | Trigger/echo control, time-to-distance conversion |
-| **M3** | Member 3 | Threshold comparator, FREE/OCCUPIED classification |
-| **M4** | Member 4 | LCD formatter, HD44780 8-bit driver, display refresh logic |
