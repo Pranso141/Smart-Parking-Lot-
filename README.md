@@ -68,7 +68,7 @@ The key design challenge is that all three HC-SR04 sensors **cannot** be trigger
 │  Slot display format  →  Live slot readout              │
 └─────────────────────────────────────────────────────────┘
 ```
-
+![forest](images/Block Diagram.jpeg)
 ---
 
 ## Module Reference
