@@ -14,12 +14,8 @@ A Verilog implementation of a real-time smart parking lot monitor that uses thre
   - [M2 — Trigger/Echo Control & Distance Calculator](#m2--triggerecho-control--distance-calculator)
   - [M3 — Threshold Comparator](#m3--threshold-comparator)
   - [M4 — LCD Formatter & Display Driver](#m4--lcd-formatter--display-driver)
-- [Signal Flow](#signal-flow)
-- [File Structure](#file-structure)
 - [Simulation & Testbenches](#simulation--testbenches)
-- [Timing Parameters](#timing-parameters)
-- [LCD Display Format](#lcd-display-format)
-- [Team Allocation](#team-allocation)
+
 
 ---
 
@@ -137,17 +133,10 @@ The following image shows the functional verification of the module outputs:
 
 ### Resource Utilization
 The synthesis results for the FPGA are summarized here:
+
 ![Resource Utilization](images/Resource%20Utilization.PNG)
 
 ---
 
 
-## Timing Parameters
-
-### Full Round-Robin Cycle Time (worst case)
-```
-3 × (TRIG + ECHO_TIMEOUT + SETTLE)
-= 3 × (10 µs + 38 ms + 10 ms)
-≈ 144 ms per full poll of all three slots
-```
 
