@@ -83,20 +83,20 @@ module parking_lot_top #(
 );
 
     // ------------------------------------------------------------------
-    // Internal wires connecting M1 → M2 → M3 → M4
+    // Internal wires connecting M1 ? M2 ? M3 ? M4
     // ------------------------------------------------------------------
 
-    // M1 → M2
+    // M1 ? M2
     wire [20:0] m1_echo_ticks;
     wire [1:0]  m1_slot_id;
     wire        m1_valid;
 
-    // M2 → M3
+    // M2 ? M3
     wire [8:0]  m2_distance_cm;
     wire [1:0]  m2_slot_id_out;
     wire        m2_dist_valid;
 
-    // M3 → M4
+    // M3 ? M4
     wire [2:0]  m3_slot_status;
 
     // ------------------------------------------------------------------
