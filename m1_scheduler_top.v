@@ -10,15 +10,15 @@
 //
 //    1. Assert a 10 µs trigger on the ACTIVE sensor only.
 //    2. Wait for the echo pin to go HIGH (rising edge detect).
-//       If no rising edge within ECHO_TIMEOUT → treat as
+//       If no rising edge within ECHO_TIMEOUT ? treat as
 //       "no object / out of range."
-//    3. Count clock ticks while echo is HIGH → raw distance
+//    3. Count clock ticks while echo is HIGH ? raw distance
 //       proportional to time-of-flight.
 //    4. Output {echo_ticks, slot_id} with a 1-cycle valid
 //       strobe to M2 (Distance Calculator).
 //    5. Enforce a SETTLE_TICKS dead time before the next
 //       sensor to prevent acoustic crosstalk.
-//    6. Advance slot_ptr: 0 → 1 → 2 → 0 (round-robin).
+//    6. Advance slot_ptr: 0 ? 1 ? 2 ? 0 (round-robin).
 //
 //  PARAMETERS (override for simulation or different clocks)
 //  ----------------------------------------------------------
@@ -31,7 +31,7 @@
 //  -----
 //  echo_in  [2:0] : echo pins from sensors 1/2/3 (bit 0 = slot 1)
 //  trig_out [2:0] : trigger pins to sensors 1/2/3 (bit 0 = slot 1)
-//  echo_ticks     : captured echo pulse width (clock ticks) → to M2
+//  echo_ticks     : captured echo pulse width (clock ticks) ? to M2
 //  slot_id  [1:0] : 0=slot1, 1=slot2, 2=slot3
 //  valid          : 1-cycle strobe - latch echo_ticks + slot_id now
 // ============================================================
@@ -56,6 +56,18 @@ module m1_scheduler_top #(
     output reg         valid        // 1-cycle strobe: outputs are valid
 );
 
+
+reg [2:0] echo_s1, echo_s2;  // 2-FF synchronizer
+
+always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        echo_s1 <= 3'b000;
+        echo_s2 <= 3'b000;
+    end else begin
+        echo_s1 <= echo_in;   // stage 1
+        echo_s2 <= echo_s1;   // stage 2 (stable, safe to use)
+    end
+end
     // ------------------------------------------------------------------
     // FSM State Encoding
     // ------------------------------------------------------------------
@@ -72,7 +84,7 @@ module m1_scheduler_top #(
     reg [20:0] meas;        // echo high-time accumulator
 
     // Mux: select echo signal of the currently active sensor
-    wire echo_cur = echo_in[slot_ptr];
+wire echo_cur = echo_s2[slot_ptr];
 
     // ------------------------------------------------------------------
     // Main FSM
@@ -118,8 +130,8 @@ module m1_scheduler_top #(
 
                 // --------------------------------------------------
                 // WAIT_HI: watch for echo rising edge.
-                //   - If echo goes HIGH   → start measurement.
-                //   - If ECHO_TIMEOUT hit → no object, emit result.
+                //   - If echo goes HIGH   ? start measurement.
+                //   - If ECHO_TIMEOUT hit ? no object, emit result.
                 // --------------------------------------------------
                 S_WAIT_HI: begin
                     if (echo_cur) begin
@@ -139,8 +151,8 @@ module m1_scheduler_top #(
 
                 // --------------------------------------------------
                 // MEASURE: count cycles while echo pin is HIGH.
-                //   - Falling edge of echo → capture measurement.
-                //   - If echo stuck HIGH past ECHO_TIMEOUT → timeout.
+                //   - Falling edge of echo ? capture measurement.
+                //   - If echo stuck HIGH past ECHO_TIMEOUT ? timeout.
                 // --------------------------------------------------
                 S_MEASURE: begin
                     if (!echo_cur) begin
@@ -169,7 +181,7 @@ module m1_scheduler_top #(
                 // --------------------------------------------------
                 S_SETTLE: begin
                     if (cnt == SETTLE_TICKS - 1) begin
-                        // Round-robin: 0 → 1 → 2 → 0
+                        // Round-robin: 0 ? 1 ? 2 ? 0
                         slot_ptr <= (slot_ptr == 2'd2) ? 2'd0
                                                        : slot_ptr + 1'b1;
                         cnt      <= 21'd0;
